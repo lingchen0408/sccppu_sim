@@ -49,7 +49,7 @@ module ctrl(Op, Funct7, Funct3, Zero,
     wire i_ori   =  itype_r&  Funct3[2]&  Funct3[1]& ~Funct3[0]; // ori 110
     wire i_xori  =  itype_r&  Funct3[2]& ~Funct3[1]& ~Funct3[0]; // xori 100
     wire i_slti  =  itype_r& ~Funct3[2]&  Funct3[1]& ~Funct3[0]; // slti 010
-    wire i_sltiu =  itype_r& ~Funct3[2]&  Funct3[1]&  Funct3[0]; // sltiu 011
+    wire i_sltui =  itype_r& ~Funct3[2]&  Funct3[1]&  Funct3[0]; // sltiu 011
     wire i_srli  =  itype_r& ~Funct7[6]&~Funct7[5]&~Funct7[4]&~Funct7[3]&~Funct7[2]&~Funct7[1]&~Funct7[0]& Funct3[2]& ~Funct3[1]& Funct3[0]; // srli 0000000 101
     wire i_srai  =  itype_r& ~Funct7[6]& Funct7[5]&~Funct7[4]&~Funct7[3]&~Funct7[2]&~Funct7[1]&~Funct7[0]& Funct3[2]& ~Funct3[1]& Funct3[0]; // srai 0100000 101
     wire i_slli  =  itype_r& ~Funct7[6]&~Funct7[5]&~Funct7[4]&~Funct7[3]&~Funct7[2]&~Funct7[1]&~Funct7[0]&~Funct3[2]& ~Funct3[1]& Funct3[0]; // slli 0000000 001
@@ -85,7 +85,7 @@ module ctrl(Op, Funct7, Funct3, Zero,
   // EXT_CTRL_UTYPE	      6'b000010
   // EXT_CTRL_JTYPE	      6'b000001
   assign EXTOp[5]    = i_slli | i_srli | i_srai; // shamt
-  assign EXTOp[4]    = i_addi | i_andi | i_ori | i_xori | i_slti | i_sltiu | itype_l | i_jalr;
+  assign EXTOp[4]    = i_addi | i_andi | i_ori | i_xori | i_slti | i_sltui | itype_l | i_jalr;
   assign EXTOp[3]    = stype; 
   assign EXTOp[2]    = sbtype; 
   assign EXTOp[1]    = LUI;
@@ -123,7 +123,7 @@ module ctrl(Op, Funct7, Funct3, Zero,
 // ALUOp_bltu 5'b01000
 // ALUOp_bgeu 5'b01001
     assign ALUOp[4] = i_srl | i_sra | i_srli | i_srai;
-    assign ALUOp[3] = i_and | i_andi | i_or | | i_ori | i_sll | i_slli | i_xor | i_xori | i_slt | i_slti | i_sltu | i_sltui | i_bltu |i_bgeu ;
+    assign ALUOp[3] = i_and | i_andi | i_or | | i_ori | i_sll | i_slli | i_xor | i_xori | i_slt | i_slti | i_sltu | i_sltui | i_bltu | i_bgeu ;
     assign ALUOp[2] = i_and | i_andi | i_or | i_ori | i_sub | i_beq | i_sll | i_slli | i_xor | i_xori | i_bne | i_blt | i_bge ;
     assign ALUOp[1] = i_addi | i_add | i_and | i_andi | i_sll | i_slli | itype_l | stype | i_slt | i_slti | i_sltu | i_sltui | i_blt | i_bge ;
 	  assign ALUOp[0] = i_addi | i_add | i_or | i_ori | LUI | i_sll | i_slli | i_sra | i_srai | itype_l | stype | i_sltu | i_sltui | i_bne | i_bge | i_bgeu ;

@@ -15,7 +15,7 @@ module NPC( PC, NPCOp, IMM, RD1, NPC );  // next pc module
           `NPC_PLUS4:  NPC = PCPLUS4;   // NPC computes addr
           `NPC_BRANCH: NPC = PC+IMM;    //B type, NPC computes addr
           `NPC_JUMP:   NPC = PC+IMM;    //J type, NPC computes addr
-          `NPC_JALR: NPC = RD1+IMM;
+          `NPC_JALR: NPC = RD1+IMM;   //JALR type, NPC computes addr
           default:     NPC = PCPLUS4;
       endcase
    end 

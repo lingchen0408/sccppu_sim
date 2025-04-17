@@ -24,6 +24,10 @@
               $write("x%d = %h  ", A3, WD);
           end
         end
+        // $write("A(hex) = %h  ", rf[A1]);
+        // $write("B(hex) = %h ", rf[A2]);
+        // $write("A(dec) = %d  ", $signed(rf[A1]));
+        // $write("B(dec) = %d\n ", $signed(rf[A2]));
       end
 
     assign RD1 = (A1 != 0) ? rf[A1] : 0;
