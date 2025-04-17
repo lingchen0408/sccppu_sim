@@ -22,6 +22,11 @@ module alu(A, B, ALUOp, C, Zero);
       `ALUOp_sra:C=A>>>B;
       `ALUOp_slt:C=(A<B)?1:0; //set less than
       `ALUOp_sltu: C = ($unsigned(A) < $unsigned(B)) ? 1 : 0; // set less than unsigned
+      `ALUOp_bne: C = (A != B) ? 1 : 0; // not equal
+      `ALUOp_blt: C = (A < B) ? 1 : 0; // less than
+      `ALUOp_bge: C = (A >= B) ? 1 : 0; // greater than or equal
+      `ALUOp_bltu: C = ($unsigned(A) < $unsigned(B)) ? 1 : 0; // less than unsigned
+      `ALUOp_bgeu: C = ($unsigned(A) >= $unsigned(B)) ? 1 : 0; // greater than or equal unsigned
       default: C=A;
       endcase
    end // end always

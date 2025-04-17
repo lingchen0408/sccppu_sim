@@ -48,6 +48,7 @@ module SCCPU(
 	assign B = (ALUSrc) ? immout : RD2;
 	assign Data_out = RD2;
 	
+
     // 计算不同格式指令的立即数
 	assign iimm=inst_in[31:20];
 	assign simm={inst_in[31:25],inst_in[11:7]};
@@ -74,7 +75,7 @@ module SCCPU(
 	);
  // instantiation of pc unit
 	PC  U_PC(.clk(clk), .rst(reset), .NPC(NPC), .PC(PC_out) );
-	NPC U_NPC(.PC(PC_out), .NPCOp(NPCOp), .IMM(immout), .NPC(NPC));
+	NPC U_NPC(.PC(PC_out), .NPCOp(NPCOp), .IMM(immout), .RD1(RD1).NPC(NPC)); //增加了一个输入信号RD1
 	EXT U_EXT(
 		.iimm(iimm), .simm(simm), .bimm(bimm), .uimm(uimm), .jimm(jimm),
 		.EXTOp(EXTOp), .immout(immout)

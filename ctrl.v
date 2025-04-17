@@ -19,8 +19,8 @@ module ctrl(Op, Funct7, Funct3, Zero,
    output       ALUSrc;   // ALU source for B 
    output [1:0] WDSel;    // (register) write data selection
    
-   //Op[6]&Op[5]&Op[4]&Op[3]&Op[2]&Op[1]&Op[0];
-   
+  // 译码（将划分后的指令的每一部分进行解释）
+    
    // 确定指令的类型
    //LUI
    wire LUI = ~Op[6]&Op[5]&Op[4]&~Op[3]&Op[2]&Op[1]&Op[0];
@@ -45,6 +45,14 @@ module ctrl(Op, Funct7, Funct3, Zero,
   // i format 0010011
     wire itype_r  = ~Op[6]&~Op[5]&Op[4]&~Op[3]&~Op[2]&Op[1]&Op[0]; //0010011
     wire i_addi  =  itype_r& ~Funct3[2]& ~Funct3[1]& ~Funct3[0]; // addi 000
+    wire i_andi  =  itype_r&  Funct3[2]&  Funct3[1]&  Funct3[0]; // andi 111
+    wire i_ori   =  itype_r&  Funct3[2]&  Funct3[1]& ~Funct3[0]; // ori 110
+    wire i_xori  =  itype_r&  Funct3[2]& ~Funct3[1]& ~Funct3[0]; // xori 100
+    wire i_slti  =  itype_r& ~Funct3[2]&  Funct3[1]& ~Funct3[0]; // slti 010
+    wire i_sltiu =  itype_r& ~Funct3[2]&  Funct3[1]&  Funct3[0]; // sltiu 011
+    wire i_srli  =  itype_r& ~Funct7[6]&~Funct7[5]&~Funct7[4]&~Funct7[3]&~Funct7[2]&~Funct7[1]&~Funct7[0]& Funct3[2]& ~Funct3[1]& Funct3[0]; // srli 0000000 101
+    wire i_srai  =  itype_r& ~Funct7[6]& Funct7[5]&~Funct7[4]&~Funct7[3]&~Funct7[2]&~Funct7[1]&~Funct7[0]& Funct3[2]& ~Funct3[1]& Funct3[0]; // srai 0100000 101
+    wire i_slli  =  itype_r& ~Funct7[6]&~Funct7[5]&~Funct7[4]&~Funct7[3]&~Funct7[2]&~Funct7[1]&~Funct7[0]&~Funct3[2]& ~Funct3[1]& Funct3[0]; // slli 0000000 001
     	
   // s format 0100011
     wire stype  = ~Op[6]&Op[5]&~Op[4]&~Op[3]&~Op[2]&Op[1]&Op[0]; //0100011
@@ -53,9 +61,16 @@ module ctrl(Op, Funct7, Funct3, Zero,
   // sb format 1100011
     wire sbtype  = Op[6]&Op[5]&~Op[4]&~Op[3]&~Op[2]&Op[1]&Op[0];//1100011
     wire i_beq  = sbtype& ~Funct3[2]& ~Funct3[1]&~Funct3[0]; // beq 000
+    wire i_bne  = sbtype& ~Funct3[2]& ~Funct3[1]& Funct3[0]; // bne 001 
+    wire i_bge  = sbtype&  Funct3[2]& ~Funct3[1]& Funct3[0]; // bge 101 
+    wire i_bgeu  = sbtype&  Funct3[2]&  Funct3[1]& Funct3[0]; // bgeu 111
+    wire i_blt  = sbtype&  Funct3[2]& ~Funct3[1]& ~Funct3[0]; // blt 100
+    wire i_bltu  = sbtype&  Funct3[2]&  Funct3[1]& ~Funct3[0]; // bltu 110
+
 
   // j format
     wire i_jal  = Op[6]& Op[5]&~Op[4]& Op[3]& Op[2]& Op[1]& Op[0];  // jal 1101111
+    wire i_jal  = Op[6]& Op[5]&~Op[4]&~Op[3]& Op[2]& Op[1]& Op[0]&~Funct3[2]&~Funct3[1]&~Funct3[0];  // jalr 1100111 000
 
   // generate control signals
   assign RegWrite   = rtype | itype_r | LUI | itype_l; // register write
@@ -69,8 +84,8 @@ module ctrl(Op, Funct7, Funct3, Zero,
   // EXT_CTRL_BTYPE	      6'b000100
   // EXT_CTRL_UTYPE	      6'b000010
   // EXT_CTRL_JTYPE	      6'b000001
-  assign EXTOp[5]    = 0;
-  assign EXTOp[4]    = i_addi | itype_l;
+  assign EXTOp[5]    = i_slli | i_srli | i_srai; // shamt
+  assign EXTOp[4]    = i_addi | i_andi | i_ori | i_xori | i_slti | i_sltiu | itype_l | i_jalr;
   assign EXTOp[3]    = stype; 
   assign EXTOp[2]    = sbtype; 
   assign EXTOp[1]    = LUI;
@@ -79,33 +94,38 @@ module ctrl(Op, Funct7, Funct3, Zero,
   // WDSel_FromALU 2'b00
   // WDSel_FromMEM 2'b01
   // WDSel_FromPC  2'b10 
-    assign WDSel[1] = i_jal;
+    assign WDSel[1] = i_jal | i_jalr;
     assign WDSel[0] = itype_l;
 
   // NPC_PLUS4   3'b000
   // NPC_BRANCH  3'b001
   // NPC_JUMP    3'b010
   // NPC_JALR	   3'b100
-    assign NPCOp[2] = 0;
-    assign NPCOp[1] = i_jal;
+    assign NPCOp[2] = i_jalr;
+    assign NPCOp[1] = i_jal ;
     assign NPCOp[0] = sbtype & Zero;
 
-// ALUOp_nop 5'b00000
-// ALUOp_lui 5'b00001
-// ALUOp_add 5'b00011
-// ALUOp_sub 5'b00100
-// ALUOp_xor 5'b01100
-// ALUOp_or 5'b01101
-// ALUOp_and 5'b01110
-// ALUOp_sll 5'b01111
-// ALUOp_srl 5'b10000
-// ALUOp_sra 5'b10001
-// ALUOp_slt 5'b01010
+// ALUOp_nop  5'b00000
+// ALUOp_lui  5'b00001
+// ALUOp_add  5'b00011
+// ALUOp_sub  5'b00100
+// ALUOp_xor  5'b01100
+// ALUOp_or   5'b01101
+// ALUOp_and  5'b01110
+// ALUOp_sll  5'b01111
+// ALUOp_srl  5'b10000
+// ALUOp_sra  5'b10001
+// ALUOp_slt  5'b01010
 // ALUOp_sltu 5'b01011
+// ALUOp_bne  5'b00101
+// ALUOp_blt  5'b00110
+// ALUOp_bge  5'b00111
+// ALUOp_bltu 5'b01000
+// ALUOp_bgeu 5'b01001
     assign ALUOp[4] = i_srl | i_sra;
-    assign ALUOp[3] = i_and | i_or | i_sll | i_xor | i_slt | i_sltu;
-    assign ALUOp[2] = i_and | i_or | i_sub | i_beq | i_sll | i_xor;
-    assign ALUOp[1] = i_addi | i_add | i_and | i_sll | itype_l | stype | i_slt | i_sltu;
-	  assign ALUOp[0] = i_addi | i_add | i_or | LUI | i_sll | i_sra | itype_l | stype | i_sltu;
+    assign ALUOp[3] = i_and | i_or | i_sll | i_xor | i_slt | i_sltu | i_bltu | i_bgeu;
+    assign ALUOp[2] = i_and | i_or | i_sub | i_beq | i_sll | i_xor | i_bne | i_blt | i_bge ;
+    assign ALUOp[1] = i_addi | i_add | i_and | i_sll | itype_l | stype | i_slt | i_sltu | i_blt | i_bge ;
+	  assign ALUOp[0] = i_addi | i_add | i_or | LUI | i_sll | i_sra | itype_l | stype | i_sltu |i_bne | i_bge | i_bgeu;
 
 endmodule
