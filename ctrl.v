@@ -122,10 +122,10 @@ module ctrl(Op, Funct7, Funct3, Zero,
 // ALUOp_bge  5'b00111
 // ALUOp_bltu 5'b01000
 // ALUOp_bgeu 5'b01001
-    assign ALUOp[4] = i_srl | i_sra;
-    assign ALUOp[3] = i_and | i_or | i_sll | i_xor | i_slt | i_sltu | i_bltu | i_bgeu;
-    assign ALUOp[2] = i_and | i_or | i_sub | i_beq | i_sll | i_xor | i_bne | i_blt | i_bge ;
-    assign ALUOp[1] = i_addi | i_add | i_and | i_sll | itype_l | stype | i_slt | i_sltu | i_blt | i_bge ;
-	  assign ALUOp[0] = i_addi | i_add | i_or | LUI | i_sll | i_sra | itype_l | stype | i_sltu |i_bne | i_bge | i_bgeu;
+    assign ALUOp[4] = i_srl | i_sra | i_srli | i_srai;
+    assign ALUOp[3] = i_and | i_andi | i_or | | i_ori | i_sll | i_slli | i_xor | i_xori | i_slt | i_slti | i_sltu | i_sltui | i_bltu |i_bgeu ;
+    assign ALUOp[2] = i_and | i_andi | i_or | i_ori | i_sub | i_beq | i_sll | i_slli | i_xor | i_xori | i_bne | i_blt | i_bge ;
+    assign ALUOp[1] = i_addi | i_add | i_and | i_andi | i_sll | i_slli | itype_l | stype | i_slt | i_slti | i_sltu | i_sltui | i_blt | i_bge ;
+	  assign ALUOp[0] = i_addi | i_add | i_or | i_ori | LUI | i_sll | i_slli | i_sra | i_srai | itype_l | stype | i_sltu | i_sltui | i_bne | i_bge | i_bgeu ;
 
 endmodule
