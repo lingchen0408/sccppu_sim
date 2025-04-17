@@ -75,7 +75,7 @@ module SCCPU(
 	);
  // instantiation of pc unit
 	PC  U_PC(.clk(clk), .rst(reset), .NPC(NPC), .PC(PC_out) );
-	NPC U_NPC(.PC(PC_out), .NPCOp(NPCOp), .IMM(immout), .RD1(RD1).NPC(NPC)); //增加了一个输入信号RD1
+	NPC U_NPC(.PC(PC_out), .NPCOp(NPCOp), .IMM(immout), .RD1(RD1), .NPC(NPC)); //增加了一个输入信号RD1
 	EXT U_EXT(
 		.iimm(iimm), .simm(simm), .bimm(bimm), .uimm(uimm), .jimm(jimm),
 		.EXTOp(EXTOp), .immout(immout)

@@ -12,7 +12,7 @@ module sccomp_tb();
    // initialization of inputs
    initial begin
      // input instructions for simulation, rv32_sc_sim
-      $readmemh("rv32_sc_sim.dat", sccomp.U_imem.RAM);
+      $readmemh("Test_30_Instr.dat", sccomp.U_imem.RAM);
 
       clk = 1;
       rstn = 1; // 将PC初始化为0？

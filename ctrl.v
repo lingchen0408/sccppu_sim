@@ -70,7 +70,7 @@ module ctrl(Op, Funct7, Funct3, Zero,
 
   // j format
     wire i_jal  = Op[6]& Op[5]&~Op[4]& Op[3]& Op[2]& Op[1]& Op[0];  // jal 1101111
-    wire i_jal  = Op[6]& Op[5]&~Op[4]&~Op[3]& Op[2]& Op[1]& Op[0]&~Funct3[2]&~Funct3[1]&~Funct3[0];  // jalr 1100111 000
+    wire i_jalr  = Op[6]& Op[5]&~Op[4]&~Op[3]& Op[2]& Op[1]& Op[0]&~Funct3[2]&~Funct3[1]&~Funct3[0];  // jalr 1100111 000
 
   // generate control signals
   assign RegWrite   = rtype | itype_r | LUI | itype_l; // register write
